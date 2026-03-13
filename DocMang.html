@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
+    <title>Kerala DHR System - Document Management</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            width: 280px;
+            background: white;
+            border-right: 1px solid #e9ecef;
+            padding: 24px 0;
+        }
+
+        .logo {
+            padding: 0 24px 32px 24px;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .logo h1 {
+            font-size: 20px;
+            font-weight: 600;
+            color: #212529;
+            margin-bottom: 4px;
+        }
+
+        .logo p {
+            font-size: 14px;
+            color: #6c757d;
+            line-height: 1.4;
+        }
+
+        .nav-menu {
+            list-style: none;
+            padding: 24px 0;
+        }
+
+        .nav-item {
+            margin-bottom: 4px;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 12px 24px;
+            text-decoration: none;
+            color: #6c757d;
+            font-size: 15px;
+            transition: all 0.2s;
+        }
+
+        .nav-link.active {
+            background: #1a1d29;
+            color: white;
+            margin: 0 12px;
+            border-radius: 8px;
+        }
+
+        .nav-link:hover:not(.active) {
+            background: #f8f9fa;
+            color: #495057;
+        }
+
+        .nav-link i {
+            width: 20px;
+            height: 20px;
+            margin-right: 12px;
+            font-size: 18px;
+        }
+
+        .system-status {
+            margin: 24px;
+            padding: 16px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .status-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .status-badge {
+            background: #28a745;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .status-time {
+            font-size: 13px;
+            color: #6c757d;
+        }
+
+        /* Main Content Styles */
+        .main-content {
+            flex: 1;
+            padding: 32px;
+            background: #f8f9fa;
+        }
+
+        .header {
+            display: block;
+            margin-bottom: 32px;
+        }
+
+        .add-document-btn {
+            background: #1a1d29;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: background 0.2s;
+        }
+
+        .add-document-btn:hover {
+            background: #2a2d39;
+        }
+
+        .controls-bar {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .controls-white-box {
+            background-color: white;
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid #e0e0e0;
+            margin-bottom: 30px;
+        }
+
+        .search-box {
+            position: relative;
+            flex: 1;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 12px 45px 12px 45px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            background-color: #f8f9fa;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #666;
+        }
+
+        /* Worker Section Styles */
+        .worker-section {
+            background-color: #fff;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border: 1px solid #e0e0e0;
+            overflow: hidden;
+        }
+
+        .worker-header {
+            background-color: #fff;
+            color: #333;
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .worker-info {
+            display: flex;
+            align-items: center;
+        }
+
+        .worker-details h3 {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 0;
+        }
+
+        .document-count {
+            color: #666;
+            font-size: 14px;
+            margin-left: 10px;
+        }
+
+        .documents-container {
+            padding: 0;
+        }
+
+        .document-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 20px;
+            border-bottom: 1px solid #f0f0f0;
+            transition: all 0.2s ease;
+            background-color: #f8f9fa;
+        }
+
+        .document-item:last-child {
+            border-bottom: none;
+        }
+
+        .document-item:hover {
+            background-color: #f0f0f0;
+        }
+
+        .document-item.aadhaar {
+            background-color: #666;
+            color: white;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .document-item.aadhaar:hover {
+            background-color: #555;
+        }
+
+        .document-icon {
+            width: 40px;
+            height: 40px;
+            background-color: #e9ecef;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            font-size: 16px;
+            color: #666;
+        }
+
+        .document-item.aadhaar .document-icon {
+            background-color: rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+
+        .document-info {
+            flex: 1;
+        }
+
+        .document-title {
+            font-size: 15px;
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+
+        .document-date {
+            font-size: 13px;
+            color: #666;
+        }
+
+        .document-item.aadhaar .document-date {
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .document-action {
+            color: #666;
+            cursor: pointer;
+            font-size: 16px;
+            padding: 8px;
+            border-radius: 4px;
+            transition: background-color 0.2s ease;
+        }
+
+        .document-action:hover {
+            background-color: rgba(0, 0, 0, 0.1);
+        }
+
+        .document-item.aadhaar .document-action {
+            color: white;
+        }
+
+        .expand-toggle {
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 4px;
+            transition: background-color 0.2s ease;
+            color: #666;
+            font-size: 16px;
+        }
+
+        .expand-toggle:hover {
+            background-color: #f0f0f0;
+        }
+
+        .documents-container.collapsed {
+            display: none;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 32px;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+        }
+
+        .modal-btn {
+            background: #1a1d29;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+            }
+
+            .main-content {
+                padding: 20px;
+            }
+
+            .worker-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <aside class="sidebar">
+            <div class="logo">
+                <img src="MedicalCare.png" alt="description" width="200" height="200">
+                <p>Digital Health Records for Migrant Workers</p>
+            </div>
+
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a href="index.html" class="nav-link">
+                        <i class="fa-solid fa-house"></i>
+                        Dashboard
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="WorkerReg.html" class="nav-link">
+                        <i style="font-style: normal;">👥</i>
+                        Worker Registry
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="healthrec4.html" class="nav-link">
+                        <i class="fa-regular fa-heart"></i>
+                        Health Records
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="DocMang.html" class="nav-link active">
+                        <i class="fa-regular fa-file"></i>
+                        Documents
+                    </a>
+                </li>
+            </ul>
+
+            <div class="system-status">
+                <div class="status-header">
+                    <span style="font-weight: 600; font-size: 14px;">System Status</span>
+                    <span class="status-badge">Online</span>
+                </div>
+                <p class="status-time">Last sync: 2 mins ago</p>
+            </div>
+        </aside>
+
+        <div class="main-content">
+            <div class="header">
+                <h1>Document Management</h1>
+                <p>Track and manage documents for migrant workers</p>
+            </div>
+
+            <div class="controls-white-box">
+                <div class="controls-bar">
+                    <button class="add-document-btn">
+                        <span><i class="fa-solid fa-plus"></i></span>
+                        Add New Document
+                    </button>
+                    <div class="search-box">
+                        <span class="search-icon"><i class="fa-solid fa-magnifying-glass"></i></span>
+                        <input type="text" class="search-input" placeholder="Search Workers or Documents"
+                            id="searchInput">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Rajesh Kumar Section -->
+            <div class="worker-section" data-worker="rajesh kumar">
+                <div class="worker-header">
+                    <div class="worker-info">
+                        <h3>Rajesh Kumar</h3>
+                        <div class="document-count">4 Documents</div>
+                    </div>
+                    <div class="expand-toggle"><i class="fa-solid fa-chevron-down"></i></div>
+                </div>
+                <div class="documents-container">
+                    <div class="document-item aadhaar">
+                        <div class="document-icon">🆔</div>
+                        <div class="document-info">
+                            <div class="document-title">Aadhaar Card</div>
+                            <div class="document-date">15/01/2024</div>
+                        </div>
+                        <div class="document-action"><i class="fa-solid fa-eye"></i></div>
+                    </div>
+                    <div class="document-item">
+                        <div class="document-icon">🏥</div>
+                        <div class="document-info">
+                            <div class="document-title">Blood Test Report</div>
+                            <div class="document-date">12/09/2025</div>
+                        </div>
+                        <div class="document-action"><i class="fa-solid fa-eye"></i></div>
+                    </div>
+                    <div class="document-item">
+                        <div class="document-icon">💉</div>
+                        <div class="document-info">
+                            <div class="document-title">Vaccination Certificate</div>
+                            <div class="document-date">28/07/2025</div>
+                        </div>
+                        <div class="document-action"><i class="fa-solid fa-eye"></i></div>
+                    </div>
+                    <div class="document-item">
+                        <div class="document-icon">🫀</div>
+                        <div class="document-info">
+                            <div class="document-title">Health Checkup Report</div>
+                            <div class="document-date">05/06/2025</div>
+                        </div>
+                        <div class="document-action"><i class="fa-solid fa-eye"></i></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Priya Sharma Section -->
+            <div class="worker-section" data-worker="priya sharma">
+                <div class="worker-header">
+                    <div class="worker-info">
+                        <h3>Priya Sharma</h3>
+                        <div class="document-count">3 Documents</div>
+                    </div>
+                    <div class="expand-toggle"><i class="fa-solid fa-chevron-down"></i></div>
+                </div>
+                <div class="documents-container">
+                    <div class="document-item aadhaar">
+                        <div class="document-icon">🆔</div>
+                        <div class="document-info">
+                            <div class="document-title">Aadhaar Card</div>
+                            <div class="document-date">22/03/2024</div>
+                        </div>
+                        <div class="document-action"><i class="fa-solid fa-eye"></i></div>
+                    </div>
+                    <div class="document-item">
+                        <div class="document-icon">🔬</div>
+                        <div class="document-info">
+                            <div class="document-title">Lab Test Results</div>
+                            <div class="document-date">18/08/2025</div>
+                        </div>
+                        <div class="document-action"><i class="fa-solid fa-eye"></i></div>
+                    </div>
+                    <div class="document-item">
+                        <div class="document-icon">🩺</div>
+                        <div class="document-info">
+                            <div class="document-title">Medical Examination</div>
+                            <div class="document-date">10/04/2025</div>
+                        </div>
+                        <div class="document-action"><i class="fa-solid fa-eye"></i></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Suresh Patel Section -->
+            <div class="worker-section" data-worker="suresh patel">
+                <div class="worker-header">
+                    <div class="worker-info">
+                        <h3>Suresh Patel</h3>
+                        <div class="document-count">5 Documents</div>
+                    </div>
+                    <div class="expand-toggle"><i class="fa-solid fa-chevron-down"></i></div>
+                </div>
+                <div class="documents-container">
+                    <div class="document-item aadhaar">
+                        <div class="document-icon">🆔</div>
+                        <div class="document-info">
+                            <div class="document-title">Aadhaar Card</div>
+                            <div class="document-date">08/12/2023</div>
+                        </div>
+                        <div class="document-action"><i class="fa-solid fa-eye"></i></div>
+                    </div>
+                    <div class="document-item">
+                        <div class="document-icon">🔬</div>
+                        <div class="document-info">
+                            <div class="document-title">Chest X-Ray Report</div>
+                            <div class="document-date">15/09/2025</div>
+                        </div>
+                        <div class="document-action"><i class="fa-solid fa-eye"></i></div>
+                    </div>
+                    <div class="document-item">
+                        <div class="document-icon">💉</div>
+                        <div class="document-info">
+                            <div class="document-title">COVID Vaccination</div>
+                            <div class="document-date">03/08/2025</div>
+                        </div>
+                        <div class="document-action"><i class="fa-solid fa-eye"></i></div>
+                    </div>
+                    <div class="document-item">
+                        <div class="document-icon">🏥</div>
+                        <div class="document-info">
+                            <div class="document-title">Blood Pressure Report</div>
+                            <div class="document-date">20/07/2025</div>
+                        </div>
+                        <div class="document-action"><i class="fa-solid fa-eye"></i></div>
+                    </div>
+                    <div class="document-item">
+                        <div class="document-icon">🩺</div>
+                        <div class="document-info">
+                            <div class="document-title">Annual Health Checkup</div>
+                            <div class="document-date">12/05/2025</div>
+                        </div>
+                        <div class="document-action"><i class="fa-solid fa-eye"></i></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mohammed Ali Section -->
+            <div class="worker-section" data-worker="mohammed ali">
+                <div class="worker-header">
+                    <div class="worker-info">
+                        <h3>Mohammed Ali</h3>
+                        <div class="document-count">3 Documents</div>
+                    </div>
+                    <div class="expand-toggle"><i class="fa-solid fa-chevron-down"></i></div>
+                </div>
+                <div class="documents-container">
+                    <div class="document-item aadhaar">
+                        <div class="document-icon">🆔</div>
+                        <div class="document-info">
+                            <div class="document-title">Aadhaar Card</div>
+                            <div class="document-date">30/11/2023</div>
+                        </div>
+                        <div class="document-action"><i class="fa-solid fa-eye"></i></div>
+                    </div>
+                    <div class="document-item">
+                        <div class="document-icon">🫀</div>
+                        <div class="document-info">
+                            <div class="document-title">ECG Report</div>
+                            <div class="document-date">25/08/2025</div>
+                        </div>
+                        <div class="document-action"><i class="fa-solid fa-eye"></i></div>
+                    </div>
+                    <div class="document-item">
+                        <div class="document-icon">🩺</div>
+                        <div class="document-info">
+                            <div class="document-title">Diabetes Screening</div>
+                            <div class="document-date">14/06/2025</div>
+                        </div>
+                        <div class="document-action"><i class="fa-solid fa-eye"></i></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Lakshmi Nair Section -->
+            <div class="worker-section" data-worker="lakshmi nair">
+                <div class="worker-header">
+                    <div class="worker-info">
+                        <h3>Lakshmi Nair</h3>
+                        <div class="document-count">4 Documents</div>
+                    </div>
+                    <div class="expand-toggle"><i class="fa-solid fa-chevron-down"></i></div>
+                </div>
+                <div class="documents-container">
+                    <div class="document-item aadhaar">
+                        <div class="document-icon">🆔</div>
+                        <div class="document-info">
+                            <div class="document-title">Aadhaar Card</div>
+                            <div class="document-date">18/02/2024</div>
+                        </div>
+                        <div class="document-action"><i class="fa-solid fa-eye"></i></div>
+                    </div>
+                    <div class="document-item">
+                        <div class="document-icon">🔬</div>
+                        <div class="document-info">
+                            <div class="document-title">Pregnancy Test Report</div>
+                            <div class="document-date">10/09/2025</div>
+                        </div>
+                        <div class="document-action"><i class="fa-solid fa-eye"></i></div>
+                    </div>
+                    <div class="document-item">
+                        <div class="document-icon">💉</div>
+                        <div class="document-info">
+                            <div class="document-title">Tetanus Vaccination</div>
+                            <div class="document-date">22/07/2025</div>
+                        </div>
+                        <div class="document-action"><i class="fa-solid fa-eye"></i></div>
+                    </div>
+                    <div class="document-item">
+                        <div class="document-icon">🩺</div>
+                        <div class="document-info">
+                            <div class="document-title">General Health Checkup</div>
+                            <div class="document-date">05/05/2025</div>
+                        </div>
+                        <div class="document-action"><i class="fa-solid fa-eye"></i></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <script>
+        // Search functionality
+        document.getElementById('searchInput').addEventListener('input', function (e) {
+            const searchTerm = e.target.value.toLowerCase();
+            const workerSections = document.querySelectorAll('.worker-section');
+
+            workerSections.forEach(section => {
+                const workerName = section.getAttribute('data-worker');
+                const documentTitles = Array.from(section.querySelectorAll('.document-title'))
+                    .map(title => title.textContent.toLowerCase());
+
+                const matchesWorker = workerName.includes(searchTerm);
+                const matchesDocument = documentTitles.some(title => title.includes(searchTerm));
+
+                if (matchesWorker || matchesDocument || searchTerm === '') {
+                    section.style.display = 'block';
+                } else {
+                    section.style.display = 'none';
+                }
+            });
+        });
+
+        // Expand/Collapse functionality
+        document.querySelectorAll('.expand-toggle').forEach(toggle => {
+            toggle.addEventListener('click', function () {
+                const documentsContainer = this.parentElement.nextElementSibling;
+                const isCollapsed = documentsContainer.classList.contains('collapsed');
+
+                if (isCollapsed) {
+                    documentsContainer.classList.remove('collapsed');
+                    this.textContent = '⌄';
+                } else {
+                    documentsContainer.classList.add('collapsed');
+                    this.textContent = '>';
+                }
+            });
+        });
+
+        // Add New Document button functionality
+        document.querySelector('.add-document-btn').addEventListener('click', function () {
+            const mainContent = document.querySelector('.main-content');
+            const messageBox = document.createElement('div');
+            messageBox.classList.add('modal-overlay');
+            messageBox.innerHTML = `
+                <p class="text-xl font-semibold mb-4">Add New Document</p>
+                <p class="text-gray-600 mb-6">Functionality to open a form for selecting a worker and uploading a document would go here.</p>
+                <button onclick="this.parentElement.remove()" class="modal-btn">Close</button>
+            `;
+            mainContent.appendChild(messageBox);
+        });
+
+        // Document action buttons
+        document.querySelectorAll('.document-action').forEach(button => {
+            button.addEventListener('click', function () {
+                const documentTitle = this.parentElement.querySelector('.document-title').textContent;
+                const workerName = this.closest('.worker-section').querySelector('h3').textContent;
+
+                const mainContent = document.querySelector('.main-content');
+                const messageBox = document.createElement('div');
+                messageBox.classList.add('modal-overlay');
+                messageBox.innerHTML = `
+                    <p class="text-xl font-semibold mb-4">Viewing Document</p>
+                    <p class="text-gray-600 mb-6">Viewing: ${documentTitle} for ${workerName}</p>
+                    <button onclick="this.parentElement.remove()" class="modal-btn">Close</button>
+                `;
+                mainContent.appendChild(messageBox);
+            });
+        });
+
+        // Navigation items
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', (e) => {
+                document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+                link.classList.add('active');
+            });
+        });
+
+        // Sort documents by date (newest first) while keeping Aadhaar at top
+        function sortDocuments() {
+            document.querySelectorAll('.documents-container').forEach(container => {
+                const aadhaarCard = container.querySelector('.document-item.aadhaar');
+                const otherDocuments = Array.from(container.querySelectorAll('.document-item:not(.aadhaar)'));
+
+                otherDocuments.sort((a, b) => {
+                    const dateA = new Date(a.querySelector('.document-date').textContent.split('/').reverse().join('-'));
+                    const dateB = new Date(b.querySelector('.document-date').textContent.split('/').reverse().join('-'));
+                    return dateB - dateA;
+                });
+
+                container.innerHTML = '';
+                if (aadhaarCard) {
+                    container.appendChild(aadhaarCard);
+                }
+                otherDocuments.forEach(doc => container.appendChild(doc));
+            });
+        }
+
+        // Sort documents on page load
+        window.addEventListener('load', sortDocuments);
+    </script>
+</body>
+
+</html>
