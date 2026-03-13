@@ -1,0 +1,802 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
+    <title>Kerala DHR System - Worker Registry</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #f8f9fa;
+            color: #333;
+        }
+
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 280px;
+            background: white;
+            border-right: 1px solid #e9ecef;
+            padding: 24px 0;
+        }
+
+        .logo {
+            padding: 0 24px 32px 24px;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .logo h1 {
+            font-size: 20px;
+            font-weight: 600;
+            color: #212529;
+            margin-bottom: 4px;
+        }
+
+        .logo p {
+            font-size: 14px;
+            color: #6c757d;
+            line-height: 1.4;
+        }
+
+        .nav-menu {
+            list-style: none;
+            padding: 24px 0;
+        }
+
+        .nav-item {
+            margin-bottom: 4px;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 12px 24px;
+            text-decoration: none;
+            color: #6c757d;
+            font-size: 15px;
+            transition: all 0.2s;
+        }
+
+        .nav-link.active {
+            background: #1a1d29;
+            color: white;
+            margin: 0 12px;
+            border-radius: 8px;
+        }
+
+        .nav-link:hover:not(.active) {
+            background: #f8f9fa;
+            color: #495057;
+        }
+
+        .nav-link i {
+            width: 20px;
+            height: 20px;
+            margin-right: 12px;
+            font-size: 18px;
+        }
+
+        .system-status {
+            margin: 24px;
+            padding: 16px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .status-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .status-badge {
+            background: #28a745;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .status-time {
+            font-size: 13px;
+            color: #6c757d;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            padding: 32px;
+            background: #f8f9fa;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 32px;
+        }
+
+        .header-left h2 {
+            font-size: 28px;
+            font-weight: 600;
+            color: #212529;
+            margin-bottom: 8px;
+        }
+
+        .header-left p {
+            color: #6c757d;
+            font-size: 16px;
+        }
+
+        .register-btn {
+            background: #1a1d29;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: background 0.2s;
+        }
+
+        .register-btn:hover {
+            background: #2a2d39;
+        }
+
+        /* Controls Bar */
+        .controls-bar {
+            background: white;
+            padding: 20px 24px;
+            border-radius: 12px;
+            margin-bottom: 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .search-container {
+            display: flex;
+            align-items: center;
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 10px 16px;
+            min-width: 300px;
+        }
+
+        .search-icon {
+            color: #6c757d;
+            margin-right: 12px;
+        }
+
+        .search-input {
+            border: none;
+            background: none;
+            outline: none;
+            flex: 1;
+            font-size: 14px;
+            color: #212529;
+        }
+
+        .search-input::placeholder {
+            color: #6c757d;
+        }
+
+        .filter-tabs {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .filter-tab {
+            background: none;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+
+        .filter-tab.active {
+            background: #1a1d29;
+            color: white;
+        }
+
+        .filter-tab:not(.active) {
+            color: #6c757d;
+            background: #f8f9fa;
+        }
+
+        .filter-tab:hover:not(.active) {
+            background: #e9ecef;
+        }
+
+        .export-btn {
+            background: none;
+            border: 1px solid #dee2e6;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #495057;
+            transition: all 0.2s;
+        }
+
+        .export-btn:hover {
+            background: #f8f9fa;
+            border-color: #adb5bd;
+        }
+
+        /* Table */
+        .table-container {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .table th {
+            background: #f8f9fa;
+            padding: 16px 20px;
+            text-align: left;
+            font-weight: 600;
+            color: #495057;
+            font-size: 14px;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .table td {
+            padding: 16px 20px;
+            border-bottom: 1px solid #f8f9fa;
+            font-size: 14px;
+        }
+
+        .table tbody tr:hover {
+            background: #f8f9fa;
+        }
+
+        .worker-id {
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-weight: 600;
+            color: #495057;
+        }
+
+        .worker-name {
+            font-weight: 600;
+            color: #212529;
+        }
+
+        /* Status Badges */
+        .status-badge-table {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-align: center;
+            min-width: 80px;
+            display: inline-block;
+        }
+
+        .status-healthy {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-under-care {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-critical {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .status-pending {
+            background: #e2e3e5;
+            color: #495057;
+        }
+
+        .doc-status {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-align: center;
+            min-width: 80px;
+            display: inline-block;
+        }
+
+        .doc-complete {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .doc-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .doc-incomplete {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+        }
+
+        .action-btn {
+            background: none;
+            border: none;
+            padding: 6px;
+            border-radius: 6px;
+            cursor: pointer;
+            color: #6c757d;
+            transition: all 0.2s;
+            font-size: 16px;
+        }
+
+        .action-btn:hover {
+            background: #f8f9fa;
+            color: #495057;
+        }
+
+        /* Pagination */
+        .pagination-container {
+            padding: 20px 24px;
+            background: white;
+            display: flex;
+            justify-content: center;
+            border-top: 1px solid #f8f9fa;
+        }
+
+        .pagination {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .pagination-btn {
+            background: none;
+            border: 1px solid #dee2e6;
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            color: #495057;
+            transition: all 0.2s;
+        }
+
+        .pagination-btn:hover {
+            background: #f8f9fa;
+        }
+
+        .pagination-btn.active {
+            background: #1a1d29;
+            color: white;
+            border-color: #1a1d29;
+        }
+
+        .pagination-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+                height: auto;
+            }
+
+            .main-content {
+                padding: 20px;
+            }
+
+            .header {
+                flex-direction: column;
+                gap: 16px;
+                align-items: stretch;
+            }
+
+            .controls-bar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .search-container {
+                min-width: auto;
+            }
+
+            .table-container {
+                overflow-x: auto;
+            }
+
+            .table {
+                min-width: 800px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <aside class="sidebar">
+            <div class="logo">
+                <img src="MedicalCare.png" alt="description" width="200" height="200">
+                <p>Digital Health Records for Migrant Workers</p>
+            </div>
+
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a href="index.html" class="nav-link">
+                        <i class="fa-solid fa-house"></i>
+                        Dashboard
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="WorkerReg.html" class="nav-link active">
+                        <i style="font-style: normal;">👥</i>
+                        Worker Registry
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="healthrec4.html" class="nav-link">
+                        <i class="fa-regular fa-heart"></i>
+                        Health Records
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="DocMang.html" class="nav-link">
+                        <i class="fa-regular fa-file"></i>
+                        Documents
+                    </a>
+                </li>
+            </ul>
+
+            <div class="system-status">
+                <div class="status-header">
+                    <span style="font-weight: 600; font-size: 14px;">System Status</span>
+                    <span class="status-badge">Online</span>
+                </div>
+                <p class="status-time">Last sync: 2 mins ago</p>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <div class="header">
+                <div class="header-left">
+                    <h2>Worker Registry</h2>
+                    <p>Manage migrant worker registrations and profiles</p>
+                </div>
+
+                <button class="register-btn" onclick="window.location.href='Regform2.html'">
+                    <span><i class="fa-solid fa-plus"></i></span>
+                    Register New Worker
+                </button>
+            </div>
+
+            <div class="controls-bar">
+                <div class="search-container">
+                    <span class="search-icon"><i class="fa-solid fa-magnifying-glass"></i></span>
+                    <input type="text" class="search-input" placeholder="Search by name, ID, or state...">
+                </div>
+
+                <div class="filter-tabs">
+                    <button class="filter-tab active" data-status="all">All Health Status</button>
+                    <button class="filter-tab" data-status="healthy">Healthy</button>
+                    <button class="filter-tab" data-status="under-care">Under Care</button>
+                    <button class="filter-tab" data-status="critical">Critical</button>
+                    <button class="filter-tab" data-status="pending">Pending Check</button>
+                </div>
+
+                <button class="export-btn" style="background-color: #212529; color: white;">
+                    <span><i class="fa-solid fa-arrow-down"></i></span>
+                    Export
+                </button>
+            </div>
+
+            <div class="table-container">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Worker ID</th>
+                            <th>Name</th>
+                            <th>Age/Gender</th>
+                            <th>Home State</th>
+                            <th>Occupation</th>
+                            <th>Health Status</th>
+                            <th>Documents</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="workerTableBody">
+                        <tr>
+                            <td class="worker-id">MW001</td>
+                            <td class="worker-name">Rajesh Kumar</td>
+                            <td>32/Male</td>
+                            <td>Uttar Pradesh</td>
+                            <td>Construction Worker</td>
+                            <td><span class="status-badge-table status-healthy">Healthy</span></td>
+                            <td><span class="doc-status doc-complete">Complete</span></td>
+                            <td>
+                                <div class="action-buttons">
+                                    <button class="action-btn" title="View Details"><i
+                                            class="fa-solid fa-eye"></i></button>
+                                    <button class="action-btn" title="Edit"><i class="fa-solid fa-pencil"></i></button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="worker-id">MW002</td>
+                            <td class="worker-name">Priya Sharma</td>
+                            <td>28/Female</td>
+                            <td>Bihar</td>
+                            <td>Domestic Worker</td>
+                            <td><span class="status-badge-table status-under-care">Under Care</span></td>
+                            <td><span class="doc-status doc-pending">Pending</span></td>
+                            <td>
+                                <div class="action-buttons">
+                                    <button class="action-btn" title="View Details"><i
+                                            class="fa-solid fa-eye"></i></button>
+                                    <button class="action-btn" title="Edit"><i class="fa-solid fa-pencil"></i></button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="worker-id">MW003</td>
+                            <td class="worker-name">Mohammed Ali</td>
+                            <td>35/Male</td>
+                            <td>West Bengal</td>
+                            <td>Factory Worker</td>
+                            <td><span class="status-badge-table status-healthy">Healthy</span></td>
+                            <td><span class="doc-status doc-complete">Complete</span></td>
+                            <td>
+                                <div class="action-buttons">
+                                    <button class="action-btn" title="View Details"><i
+                                            class="fa-solid fa-eye"></i></button>
+                                    <button class="action-btn" title="Edit"><i class="fa-solid fa-pencil"></i></button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="worker-id">MW004</td>
+                            <td class="worker-name">Lakshmi Nair</td>
+                            <td>45/Female</td>
+                            <td>Tamil Nadu</td>
+                            <td>Agricultural Worker</td>
+                            <td><span class="status-badge-table status-pending">Pending Check</span></td>
+                            <td><span class="doc-status doc-incomplete">Incomplete</span></td>
+                            <td>
+                                <div class="action-buttons">
+                                    <button class="action-btn" title="View Details"><i
+                                            class="fa-solid fa-eye"></i></button>
+                                    <button class="action-btn" title="Edit"><i class="fa-solid fa-pencil"></i></button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="worker-id">MW005</td>
+                            <td class="worker-name">Suresh Patel</td>
+                            <td>29/Male</td>
+                            <td>Gujarat</td>
+                            <td>Construction Worker</td>
+                            <td><span class="status-badge-table status-critical">Critical</span></td>
+                            <td><span class="doc-status doc-complete">Complete</span></td>
+                            <td>
+                                <div class="action-buttons">
+                                    <button class="action-btn" title="View Details"><i
+                                            class="fa-solid fa-eye"></i></button>
+                                    <button class="action-btn" title="Edit"><i class="fa-solid fa-pencil"></i></button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="worker-id">MW006</td>
+                            <td class="worker-name">Anita Singh</td>
+                            <td>31/Female</td>
+                            <td>Jharkhand</td>
+                            <td>Domestic Worker</td>
+                            <td><span class="status-badge-table status-healthy">Healthy</span></td>
+                            <td><span class="doc-status doc-pending">Pending</span></td>
+                            <td>
+                                <div class="action-buttons">
+                                    <button class="action-btn" title="View Details"><i
+                                            class="fa-solid fa-eye"></i></button>
+                                    <button class="action-btn" title="Edit"><i class="fa-solid fa-pencil"></i></button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="worker-id">MW007</td>
+                            <td class="worker-name">Ravi Reddy</td>
+                            <td>38/Male</td>
+                            <td>Andhra Pradesh</td>
+                            <td>Factory Worker</td>
+                            <td><span class="status-badge-table status-under-care">Under Care</span></td>
+                            <td><span class="doc-status doc-complete">Complete</span></td>
+                            <td>
+                                <div class="action-buttons">
+                                    <button class="action-btn" title="View Details"><i
+                                            class="fa-solid fa-eye"></i></button>
+                                    <button class="action-btn" title="Edit"><i class="fa-solid fa-pencil"></i></button>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="pagination-container">
+                    <div class="pagination">
+                        <button class="pagination-btn" disabled>‹</button>
+                        <button class="pagination-btn active">1</button>
+                        <button class="pagination-btn">2</button>
+                        <button class="pagination-btn">3</button>
+                        <button class="pagination-btn">›</button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Add click handlers for navigation
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', (e) => {
+                // The following line was commented out to enable navigation
+                // e.preventDefault();
+
+                // Remove active class from all links
+                document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+
+                // Add active class to clicked link
+                link.classList.add('active');
+
+                // You can add page switching logic here
+                console.log('Navigating to:', link.textContent.trim());
+            });
+        });
+
+        // Search functionality
+        const searchInput = document.querySelector('.search-input');
+        const tableBody = document.getElementById('workerTableBody');
+        const originalRows = Array.from(tableBody.querySelectorAll('tr'));
+
+        searchInput.addEventListener('input', (e) => {
+            const searchTerm = e.target.value.toLowerCase();
+
+            originalRows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                const shouldShow = text.includes(searchTerm);
+                row.style.display = shouldShow ? '' : 'none';
+            });
+        });
+
+        // Filter functionality
+        document.querySelectorAll('.filter-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                // Remove active class from all tabs
+                document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+
+                // Add active class to clicked tab
+                tab.classList.add('active');
+
+                const status = tab.getAttribute('data-status');
+                filterByStatus(status);
+            });
+        });
+
+        function filterByStatus(status) {
+            originalRows.forEach(row => {
+                if (status === 'all') {
+                    row.style.display = '';
+                } else {
+                    const statusElement = row.querySelector('.status-badge-table');
+                    const rowStatus = getStatusFromClass(statusElement.className);
+                    row.style.display = rowStatus === status ? '' : 'none';
+                }
+            });
+        }
+
+        function getStatusFromClass(className) {
+            if (className.includes('status-healthy')) return 'healthy';
+            if (className.includes('status-under-care')) return 'under-care';
+            if (className.includes('status-critical')) return 'critical';
+            if (className.includes('status-pending')) return 'pending';
+            return 'all';
+        }
+
+        // Action button functionality
+        document.querySelectorAll('.action-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const action = btn.title.toLowerCase();
+                const row = btn.closest('tr');
+                const workerId = row.querySelector('.worker-id').textContent;
+                const workerName = row.querySelector('.worker-name').textContent;
+
+                if (action.includes('view')) {
+                    console.log('Viewing details for:', workerName, workerId);
+                    // Here you would typically open a modal or navigate to details page
+                } else if (action.includes('edit')) {
+                    console.log('Editing:', workerName, workerId);
+                    // Here you would typically open an edit form or modal
+                }
+            });
+        });
+
+        // Register new worker button
+        document.querySelector('.register-btn').addEventListener('click', () => {
+            console.log('Opening new worker registration form');
+            // Here you would typically open a registration form modal
+        });
+
+        // Export functionality
+        document.querySelector('.export-btn').addEventListener('click', () => {
+            console.log('Exporting worker data...');
+            // Here you would typically trigger a CSV/Excel export
+        });
+
+        // Pagination functionality
+        document.querySelectorAll('.pagination-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                if (btn.disabled || btn.classList.contains('active')) return;
+
+                // Remove active class from all pagination buttons
+                document.querySelectorAll('.pagination-btn').forEach(b => b.classList.remove('active'));
+
+                // Add active to clicked button (if it's a number)
+                if (!btn.textContent.includes('‹') && !btn.textContent.includes('›')) {
+                    btn.classList.add('active');
+                }
+
+                console.log('Navigating to page:', btn.textContent);
+                // Here you would typically load new data for the selected page
+            });
+        });
+
+        // Simulate real-time updates
+        function updateWorkerCount() {
+            // This could update statistics or refresh data
+            console.log('Updating worker registry data...');
+        }
+
+        // Update every 5 minutes
+        setInterval(updateWorkerCount, 300000);
+    </script>
+</body>
+
+</html>
